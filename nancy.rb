@@ -20,10 +20,14 @@ module Nancy
       handler = @routes.fetch(verb, {}).fetch(requested_path, nil)
 
       if handler
-        handler.call
+        instance_eval(&handler)
       else
         [404, {}, ["Oops! No route for #{verb} #{requested_path}"]]
       end
+    end
+
+    def params
+      @request.params
     end
 
     private
