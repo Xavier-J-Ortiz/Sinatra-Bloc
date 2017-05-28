@@ -8,6 +8,7 @@ module Nancy
     end
 
     attr_reader :routes
+    attr_reader :request
 
     def get(path, &handler)
       route("GET", path, &handler)
@@ -30,6 +31,23 @@ module Nancy
       @request.params
     end
 
+    def post(path, &handler)
+      route("POST", path, &handler)
+    end
+
+    def put(path, &handler)
+      route("PUT", path, &handler)
+    end
+
+    def patch(path, &handler)
+      route("PATCH", path, &handler)
+    end
+
+    def delete(path, &handler)
+      route("DELETE", path, &handler)
+    end
+
+
     private
     def route(verb, path, &handler)
       @routes[verb] ||= {}
@@ -41,6 +59,14 @@ nancy = Nancy::Base.new
 
 nancy.get "/hello" do
   [200, {}, ["Nancy says hello"]]
+end
+
+nancy.get "/" do
+  [200, {}, ["Your params are #{params.inspect}"]]
+end
+
+nancy.post "/" do
+    [200, {}, request.body]
 end
 
 Rack::Handler::WEBrick.run nancy, Port: 9292
