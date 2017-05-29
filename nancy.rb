@@ -21,14 +21,19 @@ module Nancy
       handler = @routes.fetch(verb, {}).fetch(requested_path, nil)
 
       if handler
-        instance_eval(&handler)
+        result = instance_eval(&handler)
+        if result.class == String
+          [200, {}, [result]]
+        else
+          result
+        end
       else
         [404, {}, ["Oops! No route for #{verb} #{requested_path}"]]
       end
     end
 
     def params
-      @request.params
+      request.params
     end
 
     def post(path, &handler)
@@ -58,7 +63,7 @@ end
 nancy = Nancy::Base.new
 
 nancy.get "/hello" do
-  [200, {}, ["Nancy says hello"]]
+  "Nancy says hello"
 end
 
 nancy.get "/" do
@@ -66,7 +71,7 @@ nancy.get "/" do
 end
 
 nancy.post "/" do
-    [200, {}, request.body]
+  [200, {}, request.body]
 end
 
 Rack::Handler::WEBrick.run nancy, Port: 9292
